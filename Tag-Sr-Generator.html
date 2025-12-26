@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Horizontal SR Number Generator</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 5px; margin: 5px; }
+    textarea { width: 100%; margin-top: 10px; font-family: monospace; }
+    #srInput, #srOutput { height: 100px; }
+  </style>
+</head>
+<body>
+
+<h2>Horizontal SR Number Generator</h2>
+
+<!-- Start & End based generator -->
+<label>Start Number: <input type="text" id="startNumber" placeholder="e.g. 606986-016-0000001"></label><br>
+<label>End Number: <input type="text" id="endNumber" placeholder="e.g. 606986-016-0000007"></label><br>
+<button onclick="generateRange()">Generate</button>
+<button onclick="copyResult()">Copy</button>
+
+<hr>
+
+<!-- Paste SR numbers here -->
+<h3>Or Paste SR Numbers Below:</h3>
+<textarea id="srInput" placeholder="Paste SR numbers here..."></textarea><br>
+<button onclick="formatAndSort()">Format & Sort</button>
+
+<textarea id="srOutput" readonly placeholder="Output will appear here..."></textarea>
+<p><strong>Total:</strong> <span id="totalCount">0</span></p>
+
+<script>
+// For Start & End range
+function generateRange() {
+  const start = document.getElementById("startNumber").value.trim();
+  const end = document.getElementById("endNumber").value.trim();
+
+  if (!start || !end) {
+    alert("Please enter both start and end SR numbers.");
+    return;
+  }
+
+  const prefix = start.substring(0, start.lastIndexOf('-') + 1);
+  const startNum = parseInt(start.split('-').pop(), 10);
+  const endNum = parseInt(end.split('-').pop(), 10);
+
+  let resultArr = [];
+
+  for (let i = startNum; i <= endNum; i++) {
+    const padded = i.toString().padStart(7, '0');
+    resultArr.push(prefix + padded);
+  }
+
+  const srLine = resultArr.join(',') + ',';
+  document.getElementById("srOutput").value = srLine;
+  document.getElementById("totalCount").innerText = resultArr.length;
+}
+
+// For copy
+function copyResult() {
+  const textarea = document.getElementById("srOutput");
+  textarea.select();
+  document.execCommand("copy");
+  alert("SR Numbers copied!");
+}
+
+// Format & Sort pasted data
+function formatAndSort() {
+  const inputText = document.getElementById("srInput").value;
+  
+  const srNumbers = inputText
+    .split(/[\s,]+/) // Split on spaces, newlines, or commas
+    .filter(sr => /^606986-\d{3}-\d{7}$/.test(sr)); // Valid SR number format
+
+  const sorted = srNumbers.sort((a, b) => {
+    const numA = parseInt(a.split('-').join(''));
+    const numB = parseInt(b.split('-').join(''));
+    return numB - numA; // Descending
+  });
+
+  const result = sorted.join(',') + ',';
+  document.getElementById("srOutput").value = result;
+  document.getElementById("totalCount").innerText = sorted.length;
+}
+</script>
+
+</body>
+</html>
